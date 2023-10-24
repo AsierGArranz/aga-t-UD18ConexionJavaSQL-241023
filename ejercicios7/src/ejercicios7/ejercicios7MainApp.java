@@ -1,0 +1,104 @@
+package ejercicios7;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JOptionPane;
+
+
+
+public class ejercicios7MainApp {
+	static Connection conexion;
+
+	public static void main(String[] args) {
+		
+		MySQLConnection("root","password","");
+		crateDB("loscientificos");
+		createTable("loscientificos", "cientificos"," (Dni VARCHAR(10) PRIMARY KEY, NomApels VARCHAR(255));");
+		insertData("loscientificos", "cientificos", " (Dni, NomApels) VALUE('39471662M','AsierGonzalez');");
+		
+		createTable("loscientificos", "proyecto", " (IdProy VARCHAR(4) PRIMARY KEY, Nombre VARCHAR(255), Horas int);");
+		insertData("loscientificos", "proyecto", "(IdProy, Nombre, Horas) VALUE('374A','CreaPuentes',120);");
+		
+		createTable("loscientificos", "asignado", " (Cientifico VARCHAR(10), Proyecto VARCHAR(4), PRIMARY KEY(Cientifico, Proyecto), "
+				+ "FOREIGN KEY(Cientifico) REFERENCES cientificos(Dni) ON DELETE CASCADE ON UPDATE CASCADE, "
+				+ "FOREIGN KEY(Proyecto) REFERENCES proyecto(IdProy) ON DELETE CASCADE ON UPDATE CASCADE)");
+		insertData("loscientificos", "asignado", "(Cientifico, Proyecto) VALUE('39471662M','374A');");
+		
+		
+	}
+	//poder cerrar la conexion
+	public static void closeConnection() {
+		try {
+			conexion.close();
+			System.out.println("Se ha finalizado la conexion con el servidor");
+			
+		}catch(SQLException ex){
+			System.out.println("falla al cerrar conexion");
+		}
+	}
+	//crear una DB
+	public static void crateDB(String name) {
+		try {
+			String Query ="CREATE DATABASE "+name;
+			Statement st = conexion.createStatement();
+			st.executeUpdate(Query);
+			closeConnection();
+			MySQLConnection("root", "password", name);
+			JOptionPane.showMessageDialog(null, "se ha creado la base de datos "+name+" de forma exitosa");
+		}catch(SQLException ex) {
+			System.out.println("falla al crear");
+		}
+		
+	}
+	//crear la conexion con MySQLWorkbench y Docker
+	public static void MySQLConnection(String user, String password, String name) {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conexion=DriverManager.getConnection("jdbc:mysql://localhost:33060?useTimezone=true&serverTimezone=UTC",user,password);
+			System.out.println("Server Conected");
+			
+		}catch(SQLException | ClassNotFoundException ex){
+			System.out.println("No se ha podido conectar con mi base de datos");
+			System.out.println(ex);
+		}
+	}
+	//crear una tabla
+	public static void createTable(String db, String tablename, String cratabla) { 
+		try {
+			String Querydb = "USE "+db+";";
+			Statement stdb= conexion.createStatement();
+			stdb.executeUpdate(Querydb);
+			
+			String Query = "CREATE TABLE "+ tablename+ cratabla;
+			
+			Statement st= conexion.createStatement();
+			st.executeUpdate(Query);
+			System.out.println("la tabla"+tablename+" se ha creado con exito");
+			
+		}catch(SQLException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println("error al crear la tabla "+tablename);
+		}
+	}
+	//insert a una tabla
+	public static void insertData(String db, String tablename, String creainsert) {
+		try {
+			String Querydb = "USE "+db+";";
+			Statement stdb= conexion.createStatement();
+			stdb.executeUpdate(Querydb);
+			
+			String Query = "INSERT INTO "+tablename+creainsert;
+			Statement st= conexion.createStatement();
+			st.executeUpdate(Query);
+			
+			System.out.println("datos almacenados en "+tablename+ " correctamente");
+		}catch(SQLException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println("error en el almacenamiento "+tablename);
+		}
+		
+	}
+
+}

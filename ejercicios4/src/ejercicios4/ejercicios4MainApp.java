@@ -1,0 +1,141 @@
+package ejercicios4;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JOptionPane;
+
+
+
+public class ejercicios4MainApp {
+	static Connection conexion;
+
+	public static void main(String[] args) {
+		
+		MySQLConnection("root","password","");
+		crateDB("peliculasysalas");
+		
+		createTablePel("peliculasysalas", "peliculas");
+		insertDataPel("peliculasysalas", "peliculas", 1, "'Piratas del carive'", 1);
+		
+		createTableSal("peliculasysalas", "salas");
+		insertDataSal("peliculasysalas", "salas", 1, "'YelmosCine'", 1);
+		
+	}
+	//poder cerrar la conexion
+	public static void closeConnection() {
+		try {
+			conexion.close();
+			System.out.println("Se ha finalizado la conexion con el servidor");
+			
+		}catch(SQLException ex){
+			System.out.println("falla al cerrar conexion");
+		}
+	}
+	//crear una DB
+	public static void crateDB(String name) {
+		try {
+			String Query ="CREATE DATABASE "+name;
+			Statement st = conexion.createStatement();
+			st.executeUpdate(Query);
+			closeConnection();
+			MySQLConnection("root", "password", name);
+			JOptionPane.showMessageDialog(null, "se ha creado la base de datos "+name+" de forma exitosa");
+		}catch(SQLException ex) {
+			System.out.println("falla al crear");
+		}
+		
+	}
+	//crear la conexion con MySQLWorkbench y Docker
+	public static void MySQLConnection(String user, String password, String name) {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conexion=DriverManager.getConnection("jdbc:mysql://localhost:33060?useTimezone=true&serverTimezone=UTC",user,password);
+			System.out.println("Server Conected");
+			
+		}catch(SQLException | ClassNotFoundException ex){
+			System.out.println("No se ha podido conectar con mi base de datos");
+			System.out.println(ex);
+		}
+	}
+	//crea la tabla peli
+	public static void createTablePel(String db, String tablename) { 
+		try {
+			String Querydb = "USE "+db+";";
+			Statement stdb= conexion.createStatement();
+			stdb.executeUpdate(Querydb);
+			
+			//tabla de ejemplo
+			String Query = "CREATE TABLE "+ tablename+
+					" (CodigoPel INT PRIMARY KEY, Nombre VARCHAR(50), CalificacionEdad int);";
+			
+			Statement st= conexion.createStatement();
+			st.executeUpdate(Query);
+			System.out.println("la tabla"+tablename+" se ha creado con exito");
+			
+		}catch(SQLException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println("error al crear la tabla "+tablename);
+		}
+	}
+	//insert a la tabla pelicula
+	public static void insertDataPel(String db, String tablename, int codigo, String nombre, int calificacionedad) {
+		try {
+			String Querydb = "USE "+db+";";
+			Statement stdb= conexion.createStatement();
+			stdb.executeUpdate(Querydb);
+			
+			//insert de ejemplo
+			String Query = "INSERT INTO "+tablename+" (CodigoPel, Nombre, CalificacionEdad) VALUE("+codigo+", "+nombre+", "+calificacionedad+" );";
+			Statement st= conexion.createStatement();
+			st.executeUpdate(Query);
+			
+			System.out.println("datos almacenados en "+tablename+ " correctamente");
+		}catch(SQLException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println("error en el almacenamiento "+tablename);
+		}
+		
+	}
+	
+	public static void createTableSal(String db, String tablename) { 
+		try {
+			String Querydb = "USE "+db+";";
+			Statement stdb= conexion.createStatement();
+			stdb.executeUpdate(Querydb);
+			
+			//tabla de ejemplo
+			String Query = "CREATE TABLE "+ tablename+
+					" (CodigoSal INT PRIMARY KEY, Nombre VARCHAR(50), Peliculas int, FOREIGN KEY(Peliculas) REFERENCES peliculas(CodigoPel) ON DELETE CASCADE ON UPDATE CASCADE);";
+			
+			Statement st= conexion.createStatement();
+			st.executeUpdate(Query);
+			System.out.println("la tabla"+tablename+" se ha creado con exito");
+			
+		}catch(SQLException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println("error al crear la tabla "+tablename);
+		}
+	}
+	//insert a la tabla salas
+	public static void insertDataSal(String db, String tablename, int codigo, String nombre, int pelicula) {
+		try {
+			String Querydb = "USE "+db+";";
+			Statement stdb= conexion.createStatement();
+			stdb.executeUpdate(Querydb);
+			
+			//insert de ejemplo
+			String Query = "INSERT INTO "+tablename+" (CodigoSal, Nombre, Peliculas) VALUE("+codigo+", "+nombre+", "+pelicula+" );";
+			Statement st= conexion.createStatement();
+			st.executeUpdate(Query);
+			
+			System.out.println("datos almacenados en "+tablename+ " correctamente");
+		}catch(SQLException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println("error en el almacenamiento "+tablename);
+		}
+		
+	}
+
+}

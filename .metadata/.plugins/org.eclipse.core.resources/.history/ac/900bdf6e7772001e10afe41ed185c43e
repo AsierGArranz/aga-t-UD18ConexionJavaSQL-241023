@@ -1,0 +1,22 @@
+package ejercicio1;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class ejercicio1MainApp {
+
+	public static void main(String[] args) {
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			Connection conexion=DriverManager.getConnection("jdbc:mysql://localhost33060?useTimezone=true&serverTimezone=UTC","root","password");
+			System.out.println("Server Conected");
+			
+		}catch(SQLException | ClassNotFoundException ex){
+			System.out.println("No se ha podido conectar con mi base de datos");
+			System.out.println(ex);
+		}
+
+	}
+
+}

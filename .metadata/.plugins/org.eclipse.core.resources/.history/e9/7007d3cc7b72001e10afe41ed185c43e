@@ -1,0 +1,37 @@
+package ejercicio1;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Level;
+
+import com.sun.istack.internal.logging.Logger;
+
+
+public class ejercicio1MainApp {
+
+	public static void main(String[] args) {
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			Connection conexion=DriverManager.getConnection("jdbc:mysql://localhost:33060?useTimezone=true&serverTimezone=UTC","root","password");
+			System.out.println("Server Conected");
+			
+		}catch(SQLException | ClassNotFoundException ex){
+			System.out.println("No se ha podido conectar con mi base de datos");
+			System.out.println(ex);
+		}
+		
+		
+	}
+	
+	public void closeConnection() {
+		try {
+			Conexion.close();
+			System.out.println("Se ha finalizado la conexion con el servidor");
+			
+		}catch(SQLException ex){
+			Logger.getLogger(MySQL.class.getName()).log(Level.SEVERE, null,ex);
+		}
+	}
+
+}

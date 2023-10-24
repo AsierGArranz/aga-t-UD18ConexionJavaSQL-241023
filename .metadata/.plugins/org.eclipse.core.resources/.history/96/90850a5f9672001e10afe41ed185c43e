@@ -1,0 +1,183 @@
+package ejercicios6;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JOptionPane;
+
+
+
+public class ejercicios6MainApp {
+	static Connection conexion;
+
+	public static void main(String[] args) {
+		
+		MySQLConnection("root","password","");
+		crateDB("piezasyproveedores");
+		
+		createTablePie("piezasyproveedores", "piezas");
+		insertDataPie("piezasyproveedores", "piezas", 1, "'Tornillos'");
+		
+		createTablePro("piezasyproveedores", "proveedores");
+		insertDataPro("piezasyproveedores", "proveedores", "'78AG5'", "'TornillosLocosSL'");
+		
+		createTableSum("piezasyproveedores", "suministra");
+		insertDataSum("piezasyproveedores", "suministra", 1, "'78AG5'", 500);
+		
+	}
+	//poder cerrar la conexion
+	public static void closeConnection() {
+		try {
+			conexion.close();
+			System.out.println("Se ha finalizado la conexion con el servidor");
+			
+		}catch(SQLException ex){
+			System.out.println("falla al cerrar conexion");
+		}
+	}
+	//crear una DB
+	public static void crateDB(String name) {
+		try {
+			String Query ="CREATE DATABASE "+name;
+			Statement st = conexion.createStatement();
+			st.executeUpdate(Query);
+			closeConnection();
+			MySQLConnection("root", "password", name);
+			JOptionPane.showMessageDialog(null, "se ha creado la base de datos "+name+" de forma exitosa");
+		}catch(SQLException ex) {
+			System.out.println("falla al crear");
+		}
+		
+	}
+	//crear la conexion con MySQLWorkbench y Docker
+	public static void MySQLConnection(String user, String password, String name) {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conexion=DriverManager.getConnection("jdbc:mysql://localhost:33060?useTimezone=true&serverTimezone=UTC",user,password);
+			System.out.println("Server Conected");
+			
+		}catch(SQLException | ClassNotFoundException ex){
+			System.out.println("No se ha podido conectar con mi base de datos");
+			System.out.println(ex);
+		}
+	}
+	//crea la tabla piezas
+	public static void createTablePie(String db, String tablename) { 
+		try {
+			String Querydb = "USE "+db+";";
+			Statement stdb= conexion.createStatement();
+			stdb.executeUpdate(Querydb);
+			
+			
+			String Query = "CREATE TABLE "+ tablename+
+					" (CodigoPie INT PRIMARY KEY, Nombre VARCHAR(50));";
+			
+			Statement st= conexion.createStatement();
+			st.executeUpdate(Query);
+			System.out.println("la tabla"+tablename+" se ha creado con exito");
+			
+		}catch(SQLException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println("error al crear la tabla "+tablename);
+		}
+	}
+	//insert a la tabla piezas
+	public static void insertDataPie(String db, String tablename, int codigo, String nombre) {
+		try {
+			String Querydb = "USE "+db+";";
+			Statement stdb= conexion.createStatement();
+			stdb.executeUpdate(Querydb);
+			
+			
+			String Query = "INSERT INTO "+tablename+" (CodigoPie, Nombre) VALUE("+codigo+", "+nombre+" );";
+			Statement st= conexion.createStatement();
+			st.executeUpdate(Query);
+			
+			System.out.println("datos almacenados en "+tablename+ " correctamente");
+		}catch(SQLException ex) {
+			System.out.println(ex.getMessage());
+			System.out.println("error en el almacenamiento "+tablename);
+		}
+		
+	}
+	//crea la tabla proveedores
+		public static void createTablePro(String db, String tablename) { 
+			try {
+				String Querydb = "USE "+db+";";
+				Statement stdb= conexion.createStatement();
+				stdb.executeUpdate(Querydb);
+				
+				
+				String Query = "CREATE TABLE "+ tablename+
+						" (IdPro VARCHAR(5) PRIMARY KEY, Nombre VARCHAR(50));";
+				
+				Statement st= conexion.createStatement();
+				st.executeUpdate(Query);
+				System.out.println("la tabla"+tablename+" se ha creado con exito");
+				
+			}catch(SQLException ex) {
+				System.out.println(ex.getMessage());
+				System.out.println("error al crear la tabla "+tablename);
+			}
+		}
+		//insert a la tabla proveedores
+		public static void insertDataPro(String db, String tablename, String codigo, String nombre) {
+			try {
+				String Querydb = "USE "+db+";";
+				Statement stdb= conexion.createStatement();
+				stdb.executeUpdate(Querydb);
+				
+				
+				String Query = "INSERT INTO "+tablename+" (IdPro, Nombre) VALUE("+codigo+", "+nombre+" );";
+				Statement st= conexion.createStatement();
+				st.executeUpdate(Query);
+				
+				System.out.println("datos almacenados en "+tablename+ " correctamente");
+			}catch(SQLException ex) {
+				System.out.println(ex.getMessage());
+				System.out.println("error en el almacenamiento "+tablename);
+			}
+			
+		}
+		//crea la tabla suministra
+		public static void createTableSum(String db, String tablename) { 
+			try {
+				String Querydb = "USE "+db+";";
+				Statement stdb= conexion.createStatement();
+				stdb.executeUpdate(Querydb);
+				
+				
+				String Query = "CREATE TABLE "+ tablename+
+						" (CodigoPie INT, IdPro VARCHAR(5), Precio int, PRIMARY KEY(CodigoPie, IdPro), FOREIGN KEY(CodigoPie) REFERENCES piezas(CodigoPie) ON DELETE CASCADE ON UPDATE CASCADE,  FOREIGN KEY(IdPro) REFERENCES proveedor(IdPro) ON DELETE CASCADE ON UPDATE CASCADE);";
+				
+				Statement st= conexion.createStatement();
+				st.executeUpdate(Query);
+				System.out.println("la tabla"+tablename+" se ha creado con exito");
+				
+			}catch(SQLException ex) {
+				System.out.println(ex.getMessage());
+				System.out.println("error al crear la tabla "+tablename);
+			}
+		}
+		//insert a la tabla suministra
+		public static void insertDataSum(String db, String tablename, int codigo1, String codigo2, int precio) {
+			try {
+				String Querydb = "USE "+db+";";
+				Statement stdb= conexion.createStatement();
+				stdb.executeUpdate(Querydb);
+				
+				
+				String Query = "INSERT INTO "+tablename+" (Codigo, Nombre) VALUE("+codigo1+", "+codigo2+", "+precio+" );";
+				Statement st= conexion.createStatement();
+				st.executeUpdate(Query);
+				
+				System.out.println("datos almacenados en "+tablename+ " correctamente");
+			}catch(SQLException ex) {
+				System.out.println(ex.getMessage());
+				System.out.println("error en el almacenamiento "+tablename);
+			}
+			
+		}
+
+}

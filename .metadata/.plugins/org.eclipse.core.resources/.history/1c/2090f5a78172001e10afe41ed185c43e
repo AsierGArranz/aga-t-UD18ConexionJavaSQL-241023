@@ -1,0 +1,56 @@
+package ejercicio1;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JOptionPane;
+
+
+
+public class baseMySQLMainApp {
+	static Connection conexion;
+
+	public static void main(String[] args) {
+		
+		MySQLConnection("root","password","");
+		crateDB("prueba");
+		
+	}
+	
+	public static void closeConnection() {
+		try {
+			conexion.close();
+			System.out.println("Se ha finalizado la conexion con el servidor");
+			
+		}catch(SQLException ex){
+			System.out.println("falla al cerrar conexion");
+		}
+	}
+	
+	public static void crateDB(String name) {
+		try {
+			String Query ="CREATE DATABASE "+name;
+			Statement st = conexion.createStatement();
+			st.executeUpdate(Query);
+			closeConnection();
+			MySQLConnection("root", "password", name);
+			JOptionPane.showMessageDialog(null, "se ha creado la base de datos "+name+" de forma exitosa");
+		}catch(SQLException ex) {
+			System.out.println("falla al crear");
+		}
+		
+	}
+	public static void MySQLConnection(String user, String password, String name) {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conexion=DriverManager.getConnection("jdbc:mysql://localhost:33060?useTimezone=true&serverTimezone=UTC",user,password);
+			System.out.println("Server Conected");
+			
+		}catch(SQLException | ClassNotFoundException ex){
+			System.out.println("No se ha podido conectar con mi base de datos");
+			System.out.println(ex);
+		}
+	}
+
+}
